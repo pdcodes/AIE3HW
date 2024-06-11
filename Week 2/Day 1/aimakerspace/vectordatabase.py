@@ -73,31 +73,3 @@ if __name__ == "__main__":
     query = "Sample query text"
     results = db.search_by_text(query, k=2, return_metadata=True)
     print(results)
-
-'''
-if __name__ == "__main__":
-    list_of_text = [
-        "I like to eat broccoli and bananas.",
-        "I ate a banana and spinach smoothie for breakfast.",
-        "Chinchillas and kittens are cute.",
-        "My sister adopted a kitten yesterday.",
-        "Look at this cute hamster munching on a piece of broccoli.",
-    ]
-
-    vector_db = VectorDatabase()
-    vector_db = asyncio.run(vector_db.abuild_from_list(list_of_text))
-    k = 2
-
-    searched_vector = vector_db.search_by_text("I think fruit is awesome!", k=k)
-    print(f"Closest {k} vector(s):", searched_vector)
-
-    retrieved_vector = vector_db.retrieve_from_key(
-        "I like to eat broccoli and bananas."
-    )
-    print("Retrieved vector:", retrieved_vector)
-
-    relevant_texts = vector_db.search_by_text(
-        "I think fruit is awesome!", k=k, return_as_text=True
-    )
-    print(f"Closest {k} text(s):", relevant_texts)
-'''
