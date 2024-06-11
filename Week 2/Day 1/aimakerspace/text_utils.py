@@ -1,6 +1,6 @@
 import os
+import fitz  # PyMuPDF
 from typing import List
-
 
 class TextFileLoader:
     def __init__(self, path: str, encoding: str = "utf-8"):
@@ -11,25 +11,38 @@ class TextFileLoader:
     def load(self):
         if os.path.isdir(self.path):
             self.load_directory()
-        elif os.path.isfile(self.path) and self.path.endswith(".txt"):
-            self.load_file()
+        elif os.path.isfile(self.path):
+            if self.path.endswith(".txt"):
+                self.load_txt_file(self.path)
+            elif self.path.endswith(".pdf"):
+                self.load_pdf_file(self.path)
+            else:
+                raise ValueError("Provided path is neither a valid .txt nor a .pdf file.")
         else:
-            raise ValueError(
-                "Provided path is neither a valid directory nor a .txt file."
-            )
+            raise ValueError("Provided path is neither a valid directory nor a file.")
 
-    def load_file(self):
-        with open(self.path, "r", encoding=self.encoding) as f:
+    def load_txt_file(self, file_path: str):
+        with open(file_path, "r", encoding=self.encoding) as f:
             self.documents.append(f.read())
+
+    def load_pdf_file(self, file_path: str):
+        content = ""
+        try:
+            document = fitz.open(file_path)
+            for page_num in range(len(document)):
+                page = document.load_page(page_num)
+                content += page.get_text()
+        except Exception as e:
+            print(f"Error reading PDF file {file_path}: {e}")
+        self.documents.append(content)
 
     def load_directory(self):
         for root, _, files in os.walk(self.path):
             for file in files:
                 if file.endswith(".txt"):
-                    with open(
-                        os.path.join(root, file), "r", encoding=self.encoding
-                    ) as f:
-                        self.documents.append(f.read())
+                    self.load_txt_file(os.path.join(root, file))
+                elif file.endswith(".pdf"):
+                    self.load_pdf_file(os.path.join(root, file))
 
     def load_documents(self):
         self.load()
@@ -63,15 +76,29 @@ class CharacterTextSplitter:
 
 
 if __name__ == "__main__":
-    loader = TextFileLoader("data/KingLear.txt")
-    loader.load()
+    # Example usage with a .txt file
+    txt_loader = TextFileLoader("data/KingLear.txt")
+    txt_loader.load()
     splitter = CharacterTextSplitter()
-    chunks = splitter.split_texts(loader.documents)
-    print(len(chunks))
-    print(chunks[0])
+    txt_chunks = splitter.split_texts(txt_loader.documents)
+    print(f"Number of chunks from txt: {len(txt_chunks)}")
+    print(txt_chunks[0])
     print("--------")
-    print(chunks[1])
+    print(txt_chunks[1])
     print("--------")
-    print(chunks[-2])
+    print(txt_chunks[-2])
     print("--------")
-    print(chunks[-1])
+    print(txt_chunks[-1])
+
+    # Example usage with a .pdf file
+    pdf_loader = TextFileLoader("data/paul-graham-essays.pdf")
+    pdf_loader.load()
+    pdf_chunks = splitter.split_texts(pdf_loader.documents)
+    print(f"Number of chunks from pdf: {len(pdf_chunks)}")
+    print(pdf_chunks[0])
+    print("--------")
+    print(pdf_chunks[1])
+    print("--------")
+    print(pdf_chunks[-2])
+    print("--------")
+    print(pdf_chunks[-1])
