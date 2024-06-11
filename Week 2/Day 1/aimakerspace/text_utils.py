@@ -1,6 +1,6 @@
 import os
 from typing import List
-import PyPDF2
+import fitz  # PyMuPDF
 
 class TextFileLoader:
     def __init__(self, path: str, encoding: str = "utf-8"):
@@ -28,11 +28,10 @@ class TextFileLoader:
     def load_pdf_file(self, file_path: str):
         content = ""
         try:
-            with open(file_path, "rb") as f:
-                reader = PyPDF2.PdfFileReader(f)
-                for page_num in range(reader.numPages):
-                    page = reader.getPage(page_num)
-                    content += page.extractText()
+            document = fitz.open(file_path)
+            for page_num in range(len(document)):
+                page = document.load_page(page_num)
+                content += page.get_text()
         except Exception as e:
             print(f"Error reading PDF file {file_path}: {e}")
         self.documents.append(content)
