@@ -33,7 +33,8 @@ class TextFileLoader:
                     ) as f:
                         self.documents.append(f.read())
 
-    def load_pdf_file(self, file_path: str):
+
+    def load_pdf_file(self):
         content = ""
         try:
             document = fitz.open(file_path)
