@@ -1,6 +1,6 @@
 import os
+import fitz  # PyMuPDF
 from typing import List
-
 
 class TextFileLoader:
     def __init__(self, path: str, encoding: str = "utf-8"):
@@ -33,8 +33,7 @@ class TextFileLoader:
                     ) as f:
                         self.documents.append(f.read())
 
-
-    def load_pdf_file(self):
+    def load_pdf_file(self, file_path: str):
         content = ""
         try:
             document = fitz.open(file_path)
@@ -44,6 +43,7 @@ class TextFileLoader:
         except Exception as e:
             print(f"Error reading PDF file {file_path}: {e}")
         self.documents.append(content)
+
 
     def load_documents(self):
         self.load()
